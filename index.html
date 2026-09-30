@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>猎杀场 · 完整回合</title>
+<meta name="description" content="16:9 猎杀场完整回合录制演示">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath fill='%23eee' d='M2 2h10v4H6v6H2zm18 0h10v10h-4V6h-6zM2 20h4v6h6v4H2zm24 0h4v10H20v-4h6z'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<main>
+<div class="viewport"><section id="stage" aria-label="猎杀场完整回合，16 比 9 录制画面">
+<header><div class="brand"><span class="cross">⌖</span> 猎杀场 <small>THE HUNTING GROUND</small></div><div class="round"><small>ROUND</small> <b id="round-no">01</b> <span id="round-name">第一回合</span></div><div class="status"><b id="alive-count">08</b> <span>名猎手</span><em> / </em><b id="action-count">04</b> <span>次行动</span></div></header>
+<div class="field-label">行动场 / <span id="mode-label">等待行动</span></div>
+<svg id="connections" viewBox="0 0 1600 900" aria-label="行动连线"><g id="lines"></g></svg>
+<div id="cards"></div><div id="badges"></div><div id="loot-layer"></div><div id="settlement" aria-live="polite"></div><div id="chat-feed" aria-live="polite"></div><div id="result-banner" aria-live="polite"></div><div id="final-overlay" aria-live="polite"></div>
+<input id="portrait-upload" type="file" accept="image/*" hidden>
+<div class="frame-corner tl"></div><div class="frame-corner tr"></div><div class="frame-corner bl"></div><div class="frame-corner br"></div>
+</section></div>
+<section class="controls" aria-label="录制控制台">
+<div class="control-top"><div><span class="eyebrow">DIRECTOR PANEL</span><h1><span id="panel-round">第一回合</span> <span id="step-caption">/ 等待行动</span></h1></div><div class="buttons"><button id="prev-round">↑ 上一回合</button><button id="previous" aria-label="上一步">← 上一步</button><button id="next">下一步 <kbd>→</kbd></button><button id="next-round">下一回合 ↓</button><button id="record">录制画面 <kbd>H</kbd></button><button id="fullscreen">全屏 <kbd>F</kbd></button></div></div>
+<div class="round-jump"><span>回合跳转</span><div id="round-nav"></div></div>
+<div id="actions" class="actions"></div>
+<details class="icon-tuning" open>
+  <summary><span>视觉微调</span><small>ICON TUNING · 拖动即时生效</small></summary>
+  <div class="tuning-grid">
+    <div class="tuning-group">
+      <div class="tuning-title"><strong>人物库存道具</strong><span>PLAYER INVENTORY</span></div>
+      <label class="tuning-row">
+        <span>图标大小</span><input id="inv-size" type="range" min="60" max="140" step="1" value="100"><output id="inv-size-out">100%</output>
+      </label>
+      <label class="tuning-row">
+        <span>横向间距</span><input id="inv-gap-x" type="range" min="0" max="14" step="1" value="4"><output id="inv-gap-x-out">4px</output>
+      </label>
+      <label class="tuning-row">
+        <span>纵向行距</span><input id="inv-gap-y" type="range" min="0" max="12" step="1" value="2"><output id="inv-gap-y-out">2px</output>
+      </label>
+    </div>
+    <div class="tuning-group">
+      <div class="tuning-title"><strong>行动使用图标</strong><span>ACTION ICON</span></div>
+      <label class="tuning-row">
+        <span>图标大小</span><input id="action-size" type="range" min="60" max="150" step="1" value="100"><output id="action-size-out">100%</output>
+      </label>
+      <label class="tuning-row">
+        <span>图标两侧留白</span><input id="action-gap" type="range" min="0" max="36" step="1" value="10"><output id="action-gap-out">10px</output>
+      </label>
+    </div>
+    <div class="tuning-actions"><button id="tuning-reset" type="button">恢复默认</button></div>
+  </div>
+</details>
+<details class="line-tuning" open>
+  <summary><span>连线微调</span><small>LINE TUNING · 拖动即时生效</small></summary>
+  <div class="line-tuning-grid">
+    <label class="tuning-row">
+      <span>起点留白</span><input id="line-start-gap" type="range" min="0" max="80" step="1" value="12"><output id="line-start-gap-out">12px</output>
+    </label>
+    <label class="tuning-row">
+      <span>终点留白</span><input id="line-end-gap" type="range" min="0" max="80" step="1" value="12"><output id="line-end-gap-out">12px</output>
+    </label>
+    <label class="tuning-row">
+      <span>弧度</span><input id="line-curve" type="range" min="0" max="180" step="5" value="75"><output id="line-curve-out">75</output>
+    </label>
+    <div class="tuning-actions"><button id="line-tuning-reset" type="button">恢复默认</button></div>
+  </div>
+</details>
+<details class="card-tuning" open>
+  <summary><span>人物框微调</span><small>CARD SCALE · 整卡等比缩放</small></summary>
+  <div class="card-tuning-grid">
+    <label class="tuning-row">
+      <span>整体缩放</span><input id="card-scale" type="range" min="80" max="130" step="1" value="100"><output id="card-scale-out">100%</output>
+    </label>
+    <div class="tuning-actions"><button id="card-tuning-reset" type="button">恢复默认</button></div>
+  </div>
+</details>
+<div class="panel-footer"><span>← / → 逐步 · ↑ / ↓ 切回合 · Space 下一步 · H 隐藏控制台 · F 全屏</span><span id="progress">0 / 0</span></div>
+<p id="asset-warning" role="status"></p>
+</section>
+</main>
+<div id="crop-modal" class="crop-modal" hidden aria-modal="true" role="dialog" aria-label="裁剪头像">
+  <div class="crop-dialog">
+    <div class="crop-head"><strong>裁剪头像</strong><span id="crop-person-name"></span></div>
+    <div class="crop-canvas-wrap"><canvas id="crop-canvas" width="276" height="336"></canvas></div>
+    <label class="crop-zoom">缩放 <input id="crop-zoom" type="range" min="1" max="3" step="0.01" value="1"></label>
+    <div class="crop-actions"><button id="crop-cancel" type="button">取消</button><button id="crop-apply" type="button">确认裁剪</button></div>
+    <small>拖动图片调整位置 · 刷新页面后恢复默认头像</small>
+  </div>
+</div>
+
+<script src="asset-bounds.js"></script><script src="app.js"></script>
+</body></html>
